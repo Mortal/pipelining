@@ -1,1 +1,1 @@
-add_executable(stxxl-transform transform.cpp)
+add_executable(stxxl-transform transform.cpp ${COMMON_SOURCES})
