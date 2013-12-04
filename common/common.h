@@ -10,7 +10,7 @@
 struct point2;
 
 struct matrix_transform {
-	uint32_t coordinates[9];
+	double coordinates[9];
 
 	point2 apply(const point2 &);
 };
