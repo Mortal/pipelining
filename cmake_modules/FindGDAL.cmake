@@ -1,0 +1,15 @@
+FIND_LIBRARY(GDAL_LIBRARY NAMES gdal)
+FIND_PATH(GDAL_INCLUDE_DIR gdal.h 
+  PATH_SUFFIXES
+  include
+  include/gdal
+  include/GDAL)
+
+SET(GDAL_FOUND "NO")
+IF(GDAL_LIBRARY AND GDAL_INCLUDE_DIR)
+  SET(GDAL_FOUND "YES")
+ELSE ()
+  IF (GDAL_FIND_REQUIRED)
+    message (FATAL_ERROR "Required library GDAL not found.")
+  ENDIF()
+ENDIF()
