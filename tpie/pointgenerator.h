@@ -17,6 +17,7 @@ public:
 		int xsize = fetch<int>("outputxsize");
 		int ysize = fetch<int>("outputysize");
 		set_steps(xsize * ysize);
+		forward<size_t>("items", xsize * ysize);
 	}
 
 	virtual void go() override {
