@@ -18,7 +18,8 @@ int main(int argc, char ** argv) {
 	if (!options.parse_args(argc, argv)) return EXIT_FAILURE;
 	
 	tpie::tpie_init();
-	tpie::get_memory_manager().set_limit(1024*1024*1024);
+	tpie::get_memory_manager().set_limit(options.memory*1024*1024);
+	/// Initialize GDAL
 	GDALAllRegister();
 	
 	std::unique_ptr<GDALDataset> in((GDALDataset*)GDALOpen(options.input_file.c_str(), GA_ReadOnly));
@@ -47,6 +48,7 @@ int main(int argc, char ** argv) {
 	nodata = in_band->GetNoDataValue(&has_nodata);
 	if (!has_nodata) nodata=-9999;
 	out_band->SetNoDataValue(nodata);
+	/// Done initializing GDAL
 
 	tp::passive_sorter<map_point, map_point::from_yorder> ps;
 
