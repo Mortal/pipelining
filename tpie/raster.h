@@ -14,7 +14,10 @@ public:
 		set_name("RasterReader");
 	}
 
-	// TODO memory usage
+	virtual void prepare() override {
+		int xsize=fetch<int>("xsize");
+		set_minimum_memory(tpie::array<float>::memory_usage(xsize));
+	}
 
 	virtual void go() override {
 		int xsize=fetch<int>("xsize");
@@ -51,7 +54,7 @@ public:
 		band->RasterIO(GF_Write,
 					   0, y, //offset
 					   xsize, 1, //size
-					   const_cast<void *>( (void *)row.get()),
+					   const_cast<void *>( (const void *)row.get()),
 					   xsize, 1, //input size
 					   GDT_Float32, //Type
 					   0, 0); //byte offset
