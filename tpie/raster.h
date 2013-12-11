@@ -3,6 +3,7 @@
 #ifndef RASTER_H
 #define RASTER_H
 #include <gdal.h>
+#include <gdal_priv.h>
 
 template <typename dest_t>
 class RasterReader : public tp::node {
@@ -38,13 +39,16 @@ private:
 
 class RasterWriter : public tp::node {
 public:
-	RasterWriter(GDALRasterBand * band): band(band) {
+	RasterWriter(GDALRasterBand * band): band(band), y(0) {
 	}
 
-	//TODO fetch xsize and ysize
+	void propagate() override {
+		xsize = fetch<int>("xsize");
+		ysize = fetch<int>("ysize");
+	}
 
 	void push(const tpie::array<float> & row) {
-		band->RasterIO(GF_WRITE,
+		band->RasterIO(GF_Write,
 					   0, y, //offset
 					   xsize, 1, //size
 					   const_cast<void *>( (void *)row.get()),
@@ -52,15 +56,16 @@ public:
 					   GDT_Float32, //Type
 					   0, 0); //byte offset
 		++y;
-		tpie::increment_bytes_written(xsize * sizeof(T));
+		tpie::increment_bytes_written(xsize * sizeof(float));
 	}
 private:
 	GDALRasterBand * band;
 	int xsize;
 	int ysize;
+	int y;
 };
 
 typedef tp::pipe_begin<tp::factory<RasterReader, GDALRasterBand*> > rasterReader;
-typedef tp::pipe_end<tp::term_factory<RasterWriter, GDALRasterBand*> > rasterWriter;
+typedef tp::pipe_end<tp::termfactory<RasterWriter, GDALRasterBand*> > rasterWriter;
 
 #endif //RASTER_H

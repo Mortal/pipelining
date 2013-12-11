@@ -7,7 +7,7 @@ template <typename F>
 class Map {
 public:
 template <typename dest_t>
-class type {
+class type : public tp::node {
 public:
 	typedef typename F::argument_type item_type;
 
@@ -30,9 +30,9 @@ private:
 };
 
 template <typename F>
-tp::pipe_middle<tp::temp_factory<Map<F>, F> >
+tp::pipe_middle<tp::tempfactory<Map<F>, F> >
 map(const F & f) {
-	return tp::temp_factory<Map<F>, F>(f);
+	return tp::tempfactory<Map<F>, F>(f);
 }
 
 #endif // MAP_H
