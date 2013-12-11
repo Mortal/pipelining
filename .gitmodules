@@ -1,0 +1,6 @@
+[submodule "stxxl/stxxl"]
+	path = stxxl/stxxl
+	url = git://github.com/stxxl/stxxl
+[submodule "tpie/tpie"]
+	path = tpie/tpie
+	url = git://github.com/thomasmoelhave/tpie
