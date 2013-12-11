@@ -29,4 +29,22 @@ struct point2 {
 	point2(int x, int y) : x(x), y(y) {}
 };
 
+struct value_point {
+	point2 point;
+	float value;
+	value_point(point2 point, float value): point(point), value(value) {}
+	value_point() = default;
+	value_point(const value_point &) = default;
+	value_point(value_point &&) = default;
+}
+
+struct map_point {
+	point2 from;
+	point2 to;
+	map_point(point2 from, point2 to): from(from), to(to() {}
+	map_point() = default;
+	map_point(const map_point &) = default;
+	map_point(map_point &&) = default;
+}
+
 #endif // COMMON_COMMON_H
