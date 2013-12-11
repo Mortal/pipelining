@@ -5,14 +5,14 @@
 #include <gdal.h>
 
 template <typename dest_t>
-class RasterReader {
+class RasterReader : public tp::node {
 public:
-	RasterReader(dest_t && dest, GDALRasterBand * band): 
+	RasterReader(dest_t && dest, GDALRasterBand * band):
 		dest(std::move(dest)), band(band) {
-		add_push_destination(dest_t);
+		add_push_destination(dest);
 		set_name("RasterReader");
 	}
-	
+
 	// TODO memory usage
 
 	virtual void go() override {
@@ -36,13 +36,13 @@ private:
 	GDALRasterBand * band;
 };
 
-class RasterWriter {
+class RasterWriter : public tp::node {
 public:
 	RasterWriter(GDALRasterBand * band): band(band) {
 	}
-	
+
 	//TODO fetch xsize and ysize
-	
+
 	void push(const tpie::array<float> & row) {
 		band->RasterIO(GF_WRITE,
 					   0, y, //offset
