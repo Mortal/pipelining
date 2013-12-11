@@ -25,7 +25,7 @@ public:
 		int ysize = fetch<int>("outputysize");
 		for (int y = 0; y < ysize; ++y) {
 			for (int x = 0; x < xsize; ++x) {
-				dest.push(point2(x, y));
+				dest.push(point2{x, y});
 				step();
 			}
 		}
