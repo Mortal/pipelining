@@ -51,6 +51,16 @@ struct program_options {
 					0, 0, 1
 				};
 				std::copy(M.begin(), M.end(), transform.coordinates);
+			} else if (arg == "--rotate") {
+				has_transform = true;
+				double theta;
+				std::stringstream(argv[++i]) >> theta;
+				std::vector<double> M = {
+					cos(-theta), -sin(-theta), 0,
+					sin(-theta), cos(-theta), 0,
+					0, 0, 1
+				};
+				std::copy(M.begin(), M.end(), transform.coordinates);
 			} else if (arg == "--help") {
 				std::cerr << argv[0] << " usage: --input <input> --output <output> --outsize \"width height\" --translate \"<dx> <dy>\"" << std::endl;
 				return false;
