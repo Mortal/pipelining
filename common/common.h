@@ -26,6 +26,7 @@ struct point2 {
 	int x;
 	int y;
 
+	point2() {}
 	point2(int x, int y) : x(x), y(y) {}
 };
 
