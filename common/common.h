@@ -5,8 +5,10 @@
 #define COMMON_COMMON_H
 
 #include <cstdint>
-#include <string>
 #include <tuple>
+#include <iostream>
+#include <sstream>
+#include <vector>
 
 struct point2;
 
@@ -22,8 +24,46 @@ struct matrix_transform {
 struct program_options {
 	std::string input_file;
 	std::string output_file;
+	int xsize;
+	int ysize;
+	int outputxsize;
+	int outputysize;
 
 	matrix_transform transform;
+
+	bool parse_args(int argc, char ** argv) {
+		bool has_transform = false;
+		for (int i = 1; i < argc; ++i) {
+			std::string arg = argv[i];
+			if (arg == "--input") {
+				input_file = argv[++i];
+			} else if (arg == "--output") {
+				output_file = argv[++i];
+			} else if (arg == "--insize") {
+				std::stringstream(argv[++i]) >> xsize >> ysize;
+			} else if (arg == "--outsize") {
+				std::stringstream(argv[++i]) >> outputxsize >> outputysize;
+			} else if (arg == "--translate") {
+				has_transform = true;
+				double dx, dy;
+				std::stringstream(argv[++i]) >> dx >> dy;
+				std::vector<double> M = {
+					1, 0, dx,
+					0, 1, dy,
+					0, 0, 1
+				};
+				std::copy(M.begin(), M.end(), transform.coordinates);
+			} else if (arg == "--help") {
+				std::cerr << argv[0] << " usage: --input <input> --output <output> --insize \"width height\" --outsize \"width height\" --translate \"<dx> <dy>\"" << std::endl;
+				return false;
+			}
+		}
+		if (!has_transform || input_file.empty() || output_file.empty()) {
+			std::cerr << "Missing arguments, try --help?" << std::endl;
+			return false;
+		}
+		return true;
+	}
 };
 
 struct point2 {
