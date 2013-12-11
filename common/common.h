@@ -46,8 +46,8 @@ struct program_options {
 				double dx, dy;
 				std::stringstream(argv[++i]) >> dx >> dy;
 				std::vector<double> M = {
-					1, 0, dx,
-					0, 1, dy,
+					1, 0, -dx,
+					0, 1, -dy,
 					0, 0, 1
 				};
 				std::copy(M.begin(), M.end(), transform.coordinates);
