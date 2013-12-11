@@ -7,12 +7,15 @@
 #include <tpie/pipelining/factory_base.h>
 #include <tuple>
 
+namespace tpie {
+namespace pipelining {
+
 ///////////////////////////////////////////////////////////////////////////////
 /// \class factory
 /// Node factory for variadic argument generators.
 ///////////////////////////////////////////////////////////////////////////////
 template <template <typename dest_t> class R, typename... T>
-class factory : public tp::factory_base {
+class factory : public factory_base {
 public:
 	factory(T... v) : v(v...) {}
 
@@ -58,7 +61,7 @@ private:
 /// Node factory for variadic argument templated generators.
 ///////////////////////////////////////////////////////////////////////////////
 template <typename Holder, typename... T>
-class tempfactory : public tp::factory_base {
+class tempfactory : public factory_base {
 public:
 	tempfactory(T... v) : v(v...) {}
 
@@ -104,7 +107,7 @@ private:
 /// Node factory for variadic argument terminators.
 ///////////////////////////////////////////////////////////////////////////////
 template <typename R, typename... T>
-class termfactory : public tp::factory_base {
+class termfactory : public factory_base {
 public:
 	typedef R constructed_type;
 
@@ -138,5 +141,8 @@ private:
 	template <size_t N, size_t... S>
 	friend class invoker;
 };
+
+}
+}
 
 #endif // __TPIE_PIPELINING_FACTORY_HELPERS_H__
