@@ -12,7 +12,10 @@ struct point2;
 struct matrix_transform {
 	double coordinates[9];
 
-	point2 apply(const point2 &);
+	point2 operator()(const point2 &);
+
+	typedef point2 result_type;
+	typedef point2 argument_type;
 };
 
 struct program_options {

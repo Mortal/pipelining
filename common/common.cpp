@@ -2,7 +2,7 @@
 // vi:set ts=4 sts=4 sw=4 noet :
 #include "common.h"
 
-point2 matrix_transform::apply(const point2 & pt) {
+point2 matrix_transform::operator()(const point2 & pt) {
 	point2 res;
 	res.x = coordinates[0] * pt.x
 		+ coordinates[1] * pt.y
