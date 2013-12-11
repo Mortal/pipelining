@@ -9,15 +9,11 @@ class point_mapper {
 public:
 	typedef map_point value_type;
 
-private:
-	InputStream & m_inputStream;
-	value_type m_currentValue;
-	F f;
-
-public:
-	point_mapper(InputStream & inputStream, F f)
+	point_mapper(InputStream & inputStream, F f, int xsize, int ysize)
 		: m_inputStream(inputStream)
 		, f(std::move(f))
+		, xsize(xsize)
+		, ysize(ysize)
 	{
 		peek();
 	}
@@ -34,8 +30,21 @@ public:
 
 private:
 	void peek() {
-		if (!empty()) m_currentValue = map_point{*m_inputStream, f(*m_inputStream)};
+		while (!empty()) {
+			point2 p = f(*m_inputStream);
+			if (p.x >= 0 && p.x < xsize && p.y >= 0 && p.y < ysize) {
+				m_currentValue = map_point{p, *m_inputStream};
+				break;
+			}
+			++m_inputStream;
+		}
 	}
+
+	InputStream & m_inputStream;
+	value_type m_currentValue;
+	F f;
+	const int xsize;
+	const int ysize;
 };
 
 #endif // MAP_H
