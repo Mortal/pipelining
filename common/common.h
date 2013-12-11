@@ -23,8 +23,10 @@ struct program_options {
 };
 
 struct point2 {
-	uint32_t x;
-	uint32_t y;
+	int x;
+	int y;
+
+	point2(int x, int y) : x(x), y(y) {}
 };
 
 #endif // COMMON_COMMON_H
