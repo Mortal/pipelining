@@ -13,13 +13,13 @@ class PointToRaster: public tp::node {
 public:
 	typedef value_point item_type; //TODO should be automated
 
-	PointToRaster(dest_t & dest): dest(std::move(dest)) {
+	PointToRaster(dest_t && dest): dest(std::move(dest)) {
 		set_name("PointToRaster"); //TODO should be automated
 		add_push_destination(dest); //TODO should be automated
 	}
 
 	void prepare() override {
-		xsize = fetch<uint32_t>("output-xsize");
+		xsize = fetch<int>("outputxsize");
 		set_minimum_memory(tpie::array<float>::memory_usage(xsize));
 	}
 
@@ -46,8 +46,8 @@ public:
 private:
 	dest_t dest;
 	tpie::array<float> row;
-	uint32_t y;
-	uint32_t xsize;
+	int y;
+	int xsize;
 	float nodata;
 };
 

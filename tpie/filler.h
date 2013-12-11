@@ -29,21 +29,21 @@ struct Filler {
 		void begin() override {
 			y=0;
 			nodata=fetch<float>("nodata");
-			xsize=fetch<uint32_t>("xsize");
+			xsize=fetch<int>("xsize");
 		}
 		
 		void push(const tpie::array<float> & row) {
 			// For every row ind all the output points that get input points from this row
 			while (point_source.can_pull() && point_source.peek().from.y == y) {
-				map_point p = point_source().pull();
+				map_point p = point_source.pull();
 				if (p.from.x >= xsize) continue;
 				if (row[p.from.x] == nodata) continue;
-				dest.push(value_point(p.to, row[p.from.x]));
+				dest.push(value_point{p.to, row[p.from.x]});
 			}
 			++y;
 		}
 	private:
-		uint32_t xsize, y;
+		int xsize, y;
 		float nodata;
 		dest_t dest;
 		typename psf_t::constructed_type point_source;
@@ -51,6 +51,8 @@ struct Filler {
 };
 
 template <typename psf_t>
-using filler = tp::pipe_middle<tp::tempfactory<Filler<psf_t>, psf_t> >;
+tp::pipe_middle<tp::tempfactory<Filler<psf_t>, psf_t> > filler(psf_t psf) {
+	return tp::tempfactory<Filler<psf_t>, psf_t>(psf);
+}
 
 #endif //FILLER_H

@@ -6,6 +6,7 @@
 
 #include <cstdint>
 #include <string>
+#include <tuple>
 
 struct point2;
 
@@ -28,16 +29,34 @@ struct program_options {
 struct point2 {
 	int x;
 	int y;
+
+	struct yorder {
+		bool operator()(const point2 & lhs, const point2 & rhs) const {
+			return std::tie(lhs.y, lhs.x) < std::tie(rhs.y, rhs.x);
+		}
+	};
 };
 
 struct value_point {
 	point2 point;
 	float value;
+
+	struct yorder {
+		bool operator()(const value_point & lhs, const value_point & rhs) const {
+			return point2::yorder()(lhs.point, rhs.point);
+		}
+	};
 };
 
 struct map_point {
 	point2 from;
 	point2 to;
+
+	struct from_yorder {
+		bool operator()(const map_point & lhs, const map_point & rhs) const {
+			return point2::yorder()(lhs.from, rhs.from);
+		}
+	};
 };
 
 #endif // COMMON_COMMON_H

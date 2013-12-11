@@ -25,8 +25,8 @@ public:
 	};
 
 	template <typename dest_t>
-	R<dest_t> construct(const dest_t & dest) const {
-		return invoker<sizeof...(T)>::go(dest, *this);
+	R<dest_t> construct(dest_t && dest) const {
+		return invoker<sizeof...(T)>::go(std::move(dest), *this);
 	}
 
 private:
@@ -36,8 +36,8 @@ private:
 	class invoker {
 	public:
 		template <typename dest_t>
-		static R<dest_t> go(const dest_t & dest, const factory & parent) {
-			return invoker<N-1, N-1, S...>::go(dest, parent);
+		static R<dest_t> go(dest_t && dest, const factory & parent) {
+			return invoker<N-1, N-1, S...>::go(std::move(dest), parent);
 		}
 	};
 
@@ -45,8 +45,8 @@ private:
 	class invoker<0, S...> {
 	public:
 		template <typename dest_t>
-		static R<dest_t> go(const dest_t & dest, const factory & parent) {
-			R<dest_t> r(dest, std::get<S>(parent.v)...);
+		static R<dest_t> go(dest_t && dest, const factory & parent) {
+			R<dest_t> r(std::move(dest), std::get<S>(parent.v)...);
 			parent.init_node(r);
 			return r;
 		}
@@ -71,8 +71,8 @@ public:
 	};
 
 	template <typename dest_t>
-	typename Holder::template type<dest_t> construct(const dest_t & dest) const {
-		return invoker<sizeof...(T)>::go(dest, *this);
+	typename Holder::template type<dest_t> construct(dest_t && dest) const {
+		return invoker<sizeof...(T)>::go(std::move(dest), *this);
 	}
 
 private:
@@ -82,8 +82,8 @@ private:
 	class invoker {
 	public:
 		template <typename dest_t>
-		static typename Holder::template type<dest_t> go(const dest_t & dest, const tempfactory & parent) {
-			return invoker<N-1, N-1, S...>::go(dest, parent);
+		static typename Holder::template type<dest_t> go(dest_t && dest, const tempfactory & parent) {
+			return invoker<N-1, N-1, S...>::go(std::move(dest), parent);
 		}
 	};
 
@@ -91,8 +91,8 @@ private:
 	class invoker<0, S...> {
 	public:
 		template <typename dest_t>
-		static typename Holder::template type<dest_t> go(const dest_t & dest, const tempfactory & parent) {
-			typename Holder::template type<dest_t> r(dest, std::get<S>(parent.v)...);
+		static typename Holder::template type<dest_t> go(dest_t && dest, const tempfactory & parent) {
+			typename Holder::template type<dest_t> r(std::move(dest), std::get<S>(parent.v)...);
 			parent.init_node(r);
 			return r;
 		}
