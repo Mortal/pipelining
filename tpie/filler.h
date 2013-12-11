@@ -16,18 +16,19 @@ struct Filler {
 	template <typename dest_t>
 	class type: public tp::node {
 	public:
-		typedef tpie::array<float> item_type;
+		typedef tpie::array<float> item_type; //TODO should be automated
 
 		type(dest_t && dest, psf_t point_source_factory)
 			: dest(std::move(dest)),
 			  point_source(point_source_factory.construct()) {
 			set_name("Filler");
-			add_push_destination(dest);
+			add_push_destination(dest); //TODO should be automated
 			add_pull_source(point_source);
 		}
 
 		void begin() override {
 			y=0;
+			nodata=fetch<float>("nodata");
 			xsize=fetch<uint32_t>("xsize");
 		}
 		
@@ -36,12 +37,14 @@ struct Filler {
 			while (point_source.can_pull() && point_source.peek().from.y == y) {
 				map_point p = point_source().pull();
 				if (p.from.x >= xsize) continue;
+				if (row[p.from.x] == nodata) continue;
 				dest.push(value_point(p.to, row[p.from.x]));
 			}
 			++y;
 		}
 	private:
 		uint32_t xsize, y;
+		float nodata;
 		dest_t dest;
 		typename psf_t::constructed_type point_source;
 	};

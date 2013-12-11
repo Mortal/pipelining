@@ -9,5 +9,6 @@ namespace tp = tpie::pipelining;
 #include "pointgenerator.h"
 #include "raster.h"
 #include "filler.h"
+#include "point_to_raster.h"
 
 int main() { return 0; }
