@@ -24,12 +24,12 @@ struct matrix_transform {
 struct program_options {
 	std::string input_file;
 	std::string output_file;
-	int xsize;
-	int ysize;
 	int outputxsize;
 	int outputysize;
 
 	matrix_transform transform;
+
+	program_options(): outputxsize(-1), outputysize(-1) {}
 
 	bool parse_args(int argc, char ** argv) {
 		bool has_transform = false;
@@ -39,8 +39,6 @@ struct program_options {
 				input_file = argv[++i];
 			} else if (arg == "--output") {
 				output_file = argv[++i];
-			} else if (arg == "--insize") {
-				std::stringstream(argv[++i]) >> xsize >> ysize;
 			} else if (arg == "--outsize") {
 				std::stringstream(argv[++i]) >> outputxsize >> outputysize;
 			} else if (arg == "--translate") {
@@ -54,7 +52,7 @@ struct program_options {
 				};
 				std::copy(M.begin(), M.end(), transform.coordinates);
 			} else if (arg == "--help") {
-				std::cerr << argv[0] << " usage: --input <input> --output <output> --insize \"width height\" --outsize \"width height\" --translate \"<dx> <dy>\"" << std::endl;
+				std::cerr << argv[0] << " usage: --input <input> --output <output> --outsize \"width height\" --translate \"<dx> <dy>\"" << std::endl;
 				return false;
 			}
 		}
