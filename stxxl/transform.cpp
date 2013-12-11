@@ -11,26 +11,18 @@
 
 namespace sxs = stxxl::stream;
 
-int main() {
+int main(int argc, char ** argv) {
+	program_options po;
+	if (!po.parse_args(argc, argv)) return 1;
+
 	static const int runs_creator_memory = 10 * 1024 * 1024;
 	static const int runs_merger_memory = runs_creator_memory;
 
-	int xsize = 10;
-	int ysize = 20;
-
-	point_generator pg(xsize, ysize);
-
-	matrix_transform mat;
-	std::vector<double> M = {
-		0, 1, 100,
-		1, 0, 100,
-		0, 0, 1
-	};
-	std::copy(M.begin(), M.end(), &mat.coordinates[0]);
+	point_generator pg(po.outputxsize, po.outputysize);
 
 	typedef point_mapper<point_generator, matrix_transform> mapped_pg_type;
 
-	mapped_pg_type mapped_pg(pg, mat);
+	mapped_pg_type mapped_pg(pg, po.transform);
 
 	typedef sxs::runs_creator<mapped_pg_type, map_point_value_less> rc_type;
 
