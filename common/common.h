@@ -28,9 +28,16 @@ struct program_options {
 	int outputxsize;
 	int outputysize;
 
+	size_t memory;
+
 	matrix_transform transform;
 
-	program_options(): outputxsize(-1), outputysize(-1) {}
+	program_options()
+		: outputxsize(-1)
+		, outputysize(-1)
+		, memory(1024)
+	{
+	}
 
 	bool parse_args(int argc, char ** argv) {
 		bool has_transform = false;
@@ -42,6 +49,8 @@ struct program_options {
 				output_file = argv[++i];
 			} else if (arg == "--outsize") {
 				std::stringstream(argv[++i]) >> outputxsize >> outputysize;
+			} else if (arg == "--memory") {
+				std::stringstream(argv[++i]) >> memory;
 			} else if (arg == "--translate") {
 				has_transform = true;
 				double dx, dy;
@@ -63,7 +72,7 @@ struct program_options {
 				};
 				std::copy(M.begin(), M.end(), transform.coordinates);
 			} else if (arg == "--help") {
-				std::cerr << argv[0] << " usage: --input <input> --output <output> --outsize \"width height\" --translate \"<dx> <dy>\"" << std::endl;
+				std::cerr << argv[0] << " usage: --input <input> --output <output> --memory <MB> --outsize \"width height\" --translate \"<dx> <dy>\"" << std::endl;
 				return false;
 			}
 		}
