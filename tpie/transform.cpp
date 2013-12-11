@@ -27,8 +27,7 @@ int main(int argc, char ** argv) {
 
 	if (options.outputxsize == -1) options.outputxsize=xsize;
 	if (options.outputysize == -1) options.outputysize=ysize;
-
-	// TODO GET OUT SIZE
+	
 	GDALDriver * driver = GetGDALDriverManager()->GetDriverByName("ENVI");
 	std::unique_ptr<GDALDataset> out(driver->Create(options.output_file.c_str(), 
 													options.outputxsize, options.outputysize, 
