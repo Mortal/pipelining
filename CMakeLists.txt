@@ -11,3 +11,5 @@ include_directories(${GDAL_INCLUDE_DIR})
 
 add_subdirectory(tpie)
 add_subdirectory(stxxl)
+add_subdirectory(tpie_imperative)
+
