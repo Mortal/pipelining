@@ -14,12 +14,33 @@
 struct point2;
 
 struct matrix_transform {
-	double coordinates[9];
+	static const size_t DIM = 3;
+	double coordinates[DIM*DIM];
 
 	point2 operator()(const point2 &);
 
 	typedef point2 result_type;
 	typedef point2 argument_type;
+
+	void set(std::vector<double> l) {
+		if (l.size() != DIM*DIM)
+			throw std::runtime_error("Bad list passed to operator=");
+		std::copy(l.begin(), l.end(), coordinates);
+	}
+
+	// Multiply by l from the left (not the right as you might expect)
+	void multiply(std::vector<double> l) {
+		std::vector<double> a(coordinates, coordinates+DIM*DIM);
+		for (size_t i = 0; i < DIM; ++i) {
+			for (size_t j = 0; j < DIM; ++j) {
+				double r = 0.0;
+				for (size_t k = 0; k < DIM; ++k) {
+					r += a[k*DIM + j] * l[i*DIM + k];
+				}
+				coordinates[i*DIM + j] = r;
+			}
+		}
+	}
 };
 
 struct program_options {
@@ -40,7 +61,11 @@ struct program_options {
 	}
 
 	bool parse_args(int argc, char ** argv) {
-		bool has_transform = false;
+		transform.set({
+			1, 0, 0,
+			0, 1, 0,
+			0, 0, 1
+		});
 		for (int i = 1; i < argc; ++i) {
 			std::string arg = argv[i];
 			if (arg == "--input") {
@@ -52,31 +77,27 @@ struct program_options {
 			} else if (arg == "--memory") {
 				std::stringstream(argv[++i]) >> memory;
 			} else if (arg == "--translate") {
-				has_transform = true;
 				double dx, dy;
 				std::stringstream(argv[++i]) >> dx >> dy;
-				std::vector<double> M = {
+				transform.multiply({
 					1, 0, -dx,
 					0, 1, -dy,
 					0, 0, 1
-				};
-				std::copy(M.begin(), M.end(), transform.coordinates);
+				});
 			} else if (arg == "--rotate") {
-				has_transform = true;
 				double theta;
 				std::stringstream(argv[++i]) >> theta;
-				std::vector<double> M = {
+				transform.multiply({
 					cos(-theta), -sin(-theta), 0,
 					sin(-theta), cos(-theta), 0,
 					0, 0, 1
-				};
-				std::copy(M.begin(), M.end(), transform.coordinates);
+				});
 			} else if (arg == "--help") {
 				std::cerr << argv[0] << " usage: --input <input> --output <output> --memory <MB> --outsize \"width height\" --translate \"<dx> <dy>\"" << std::endl;
 				return false;
 			}
 		}
-		if (!has_transform || input_file.empty() || output_file.empty()) {
+		if (input_file.empty() || output_file.empty()) {
 			std::cerr << "Missing arguments, try --help?" << std::endl;
 			return false;
 		}
