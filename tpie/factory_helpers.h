@@ -48,6 +48,7 @@ private:
 		static R<dest_t> go(dest_t && dest, const factory & parent) {
 			R<dest_t> r(std::move(dest), std::get<S>(parent.v)...);
 			parent.init_node(r);
+			parent.add_default_edge(r, dest);
 			return r;
 		}
 	};
@@ -94,6 +95,7 @@ private:
 		static typename Holder::template type<dest_t> go(dest_t && dest, const tempfactory & parent) {
 			typename Holder::template type<dest_t> r(std::move(dest), std::get<S>(parent.v)...);
 			parent.init_node(r);
+			parent.add_default_edge(r, dest);
 			return r;
 		}
 	};

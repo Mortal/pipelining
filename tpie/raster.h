@@ -9,10 +9,7 @@ template <typename dest_t>
 class RasterReader : public tp::node {
 public:
 	RasterReader(dest_t && dest, GDALRasterBand * band):
-		dest(std::move(dest)), band(band) {
-		add_push_destination(dest);
-		set_name("RasterReader");
-	}
+		dest(std::move(dest)), band(band) {}
 
 	virtual void prepare() override {
 		int xsize=fetch<int>("xsize");
@@ -42,8 +39,7 @@ private:
 
 class RasterWriter : public tp::node {
 public:
-	RasterWriter(GDALRasterBand * band): band(band), y(0) {
-	}
+	RasterWriter(GDALRasterBand * band): band(band), y(0) {}
 
 	void propagate() override {
 		xsize = fetch<int>("xsize");

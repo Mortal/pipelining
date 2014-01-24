@@ -16,13 +16,10 @@ struct Filler {
 	template <typename dest_t>
 	class type: public tp::node {
 	public:
-		typedef tpie::array<float> item_type; //TODO should be automated
-
 		type(dest_t && dest, psf_t point_source_factory)
 			: dest(std::move(dest)),
 			  point_source(point_source_factory.construct()) {
-			set_name("Filler");
-			add_push_destination(dest); //TODO should be automated
+			add_push_destination(dest);
 			add_pull_source(point_source);
 		}
 

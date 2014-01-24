@@ -16,10 +16,7 @@ public:
 		
 		type(dest_t && dest, F f)
 			: f(std::move(f))
-			, dest(std::move(dest)) {
-			add_push_destination(dest); //TODO should be automated
-			set_name("Map");
-		}
+			, dest(std::move(dest)) {}
 
 		void begin() override {
 			xsize = fetch<int>("xsize");
