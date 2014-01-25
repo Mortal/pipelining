@@ -92,6 +92,14 @@ struct program_options {
 					sin(-theta), cos(-theta), 0,
 					0, 0, 1
 				});
+			} else if (arg == "--scale") {
+				double factor;
+				std::stringstream(argv[++i]) >> factor;
+				transform.multiply({
+					1.0/factor, 0, 0,
+					0, 1.0/factor, 0,
+					0, 0, 1
+				});
 			} else if (arg == "--help") {
 				std::cerr << argv[0] << " usage: --input <input> --output <output> --memory <MB> --outsize \"width height\" --translate \"<dx> <dy>\"" << std::endl;
 				return false;
