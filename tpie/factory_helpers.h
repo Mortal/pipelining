@@ -10,6 +10,25 @@
 namespace tpie {
 namespace pipelining {
 
+namespace bits {
+	template <typename T>
+	struct remove_cref {
+		typedef T type;
+	};
+
+	template <typename T>
+	struct remove_cref<const T &> {
+		typedef T type;
+	};
+
+	/*
+	template <typename T>
+	struct remove_cref<T &&> {
+		typedef T type;
+	};
+	*/
+} // namespace bits
+
 ///////////////////////////////////////////////////////////////////////////////
 /// \class factory
 /// Node factory for variadic argument generators.
@@ -21,11 +40,11 @@ public:
 
 	template<typename dest_t>
 	struct constructed {
-		typedef R<dest_t> type;
+		typedef R<typename bits::remove_cref<dest_t>::type> type;
 	};
 
 	template <typename dest_t>
-	R<dest_t> construct(dest_t && dest) const {
+	typename constructed<dest_t>::type construct(dest_t dest) const {
 		return invoker<sizeof...(T)>::go(std::move(dest), *this);
 	}
 
@@ -36,7 +55,7 @@ private:
 	class invoker {
 	public:
 		template <typename dest_t>
-		static R<dest_t> go(dest_t && dest, const factory & parent) {
+		static typename constructed<dest_t>::type go(dest_t dest, const factory & parent) {
 			return invoker<N-1, N-1, S...>::go(std::move(dest), parent);
 		}
 	};
@@ -45,8 +64,8 @@ private:
 	class invoker<0, S...> {
 	public:
 		template <typename dest_t>
-		static R<dest_t> go(dest_t && dest, const factory & parent) {
-			R<dest_t> r(std::move(dest), std::get<S>(parent.v)...);
+		static typename constructed<dest_t>::type go(dest_t dest, const factory & parent) {
+			typename constructed<dest_t>::type r(std::move(dest), std::get<S>(parent.v)...);
 			parent.init_node(r);
 			parent.add_default_edge(r, dest);
 			return r;
@@ -68,11 +87,11 @@ public:
 
 	template<typename dest_t>
 	struct constructed {
-		typedef typename Holder::template type<dest_t> type;
+		typedef typename Holder::template type<typename bits::remove_cref<dest_t>::type> type;
 	};
 
 	template <typename dest_t>
-	typename Holder::template type<dest_t> construct(dest_t && dest) const {
+	typename constructed<dest_t>::type construct(dest_t dest) const {
 		return invoker<sizeof...(T)>::go(std::move(dest), *this);
 	}
 
@@ -83,7 +102,7 @@ private:
 	class invoker {
 	public:
 		template <typename dest_t>
-		static typename Holder::template type<dest_t> go(dest_t && dest, const tempfactory & parent) {
+		static typename constructed<dest_t>::type go(dest_t dest, const tempfactory & parent) {
 			return invoker<N-1, N-1, S...>::go(std::move(dest), parent);
 		}
 	};
@@ -92,8 +111,8 @@ private:
 	class invoker<0, S...> {
 	public:
 		template <typename dest_t>
-		static typename Holder::template type<dest_t> go(dest_t && dest, const tempfactory & parent) {
-			typename Holder::template type<dest_t> r(std::move(dest), std::get<S>(parent.v)...);
+		static typename constructed<dest_t>::type go(dest_t dest, const tempfactory & parent) {
+			typename constructed<dest_t>::type r(std::move(dest), std::get<S>(parent.v)...);
 			parent.init_node(r);
 			parent.add_default_edge(r, dest);
 			return r;
