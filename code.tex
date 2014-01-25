@@ -1,0 +1,70 @@
+\documentclass[article,twoside,a4paper]{memoir}
+
+\usepackage{listings}
+\lstset{
+  language = C,
+  basicstyle = \ttfamily,
+  basewidth = {.5em,0.4em},
+  columns = flexible,
+  tabsize = 4,
+}
+\usepackage[T1]{fontenc}
+\usepackage[variablett]{lmodern}
+\setulmarginsandblock{1in}{1in}{*}
+\setlrmarginsandblock{1in}{1in}{*}
+\checkandfixthelayout
+
+\begin{document}
+
+\pagestyle{ruled}
+
+\newcommand{\codetitle}[1]{\section{\textsf{#1}}}
+\newcommand{\codebody}[3]{\lstinputlisting[firstline=#2,lastline=#3]{#1}}
+
+\newcommand{\code}[4]{%
+  \codetitle{#2}
+  \codebody{#1}{#3}{#4}
+}
+
+\chapter{TPIE pipelining}
+% 41
+\code{tpie/filler.h}{filler.h}{11}{51}
+% 34
+\code{tpie/map.h}{map.h}{9}{42}
+% 29
+\code{tpie/pointgenerator.h}{pointgenerator.h}{6}{34}
+\clearpage
+% 39
+\code{tpie/point_to_raster.h}{point\_to\_raster.h}{11}{49}
+% 61
+\code{tpie/raster.h}{raster.h}{8}{68}
+% 34
+\clearpage
+\codetitle{transform.cpp}
+\codebody{tpie/transform.cpp}{16}{23}
+\codebody{tpie/transform.cpp}{51}{76}
+
+\clearpage
+\chapter{STXXL}
+% 54
+\code{stxxl/raster.h}{raster.h}{10}{63}
+\clearpage
+% 50
+\code{stxxl/point_to_raster.h}{point\_to\_raster.h}{7}{56}
+\clearpage
+% 37
+\code{stxxl/compare.h}{compare.h}{7}{43}
+% 42
+\code{stxxl/map.h}{map.h}{7}{48}
+% 28
+\code{stxxl/pointgenerator.h}{pointgenerator.h}{6}{33}
+\clearpage
+% 48
+\code{stxxl/filler.h}{filler.h}{7}{54}
+\clearpage
+% 56
+\codetitle{transform.cpp}
+\codebody{stxxl/transform.cpp}{17}{24}
+\codebody{stxxl/transform.cpp}{52}{99}
+
+\end{document}
