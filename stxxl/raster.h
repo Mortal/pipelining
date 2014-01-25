@@ -12,10 +12,7 @@ public:
 	typedef std::vector<float> value_type;
 
 	RasterReader(GDALRasterBand * band, int xsize, int ysize)
-		: band(band)
-		, xsize(xsize)
-		, ysize(ysize)
-		, y(0)
+		: band(band), xsize(xsize), ysize(ysize), y(0)
 	{
 		row.resize(xsize);
 		peek();

@@ -95,6 +95,5 @@ int main(int argc, char ** argv) {
 
 	write_raster(point_to_raster, out_band, options.outputxsize);
 	std::cout << "I am now done" << std::endl;
-
 	return 0;
 }

@@ -8,12 +8,7 @@ public:
 	typedef point2 value_type;
 
 	point_generator(int xsize, int ysize)
-		: m_xsize(xsize)
-		, m_ysize(ysize)
-		, m_x(0)
-		, m_y(0)
-	{
-	}
+		: m_xsize(xsize), m_ysize(ysize), m_x(0), m_y(0) {}
 
 	bool empty() const { return m_ysize == m_y; }
 
