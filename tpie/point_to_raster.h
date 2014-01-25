@@ -15,6 +15,7 @@ public:
 
 	void prepare() override {
 		xsize = fetch<int>("outputxsize");
+		ysize = fetch<int>("outputysize");
 		set_minimum_memory(tpie::array<float>::memory_usage(xsize));
 	}
 
@@ -35,6 +36,12 @@ public:
 
 	void end() override {
 		dest.push(row);
+		std::fill(row.begin(), row.end(), nodata);
+		++y;
+		while (y < ysize) {
+			dest.push(row);
+			++y;
+		}
 		row.resize(0);
 	}
 
@@ -43,6 +50,7 @@ private:
 	tpie::array<float> row;
 	int y;
 	int xsize;
+	int ysize;
 	float nodata;
 };
 

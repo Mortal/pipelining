@@ -42,25 +42,25 @@ public:
 	RasterWriter(GDALRasterBand * band): band(band), y(0) {}
 
 	void propagate() override {
-		xsize = fetch<int>("xsize");
-		ysize = fetch<int>("ysize");
+		outputxsize = fetch<int>("outputxsize");
+		outputysize = fetch<int>("outputysize");
 	}
 
 	void push(const tpie::array<float> & row) {
 		band->RasterIO(GF_Write,
 					   0, y, //offset
-					   xsize, 1, //size
+					   outputxsize, 1, //size
 					   const_cast<void *>( (const void *)row.get()),
-					   xsize, 1, //input size
+					   outputxsize, 1, //input size
 					   GDT_Float32, //Type
 					   0, 0); //byte offset
 		++y;
-		tpie::increment_bytes_written(xsize * sizeof(float));
+		tpie::increment_bytes_written(outputxsize * sizeof(float));
 	}
 private:
 	GDALRasterBand * band;
-	int xsize;
-	int ysize;
+	int outputxsize;
+	int outputysize;
 	int y;
 };
 
