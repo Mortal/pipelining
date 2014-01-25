@@ -70,6 +70,7 @@ int main(int argc, char ** argv) {
 	p.forward("nodata", nodata);
 	p.forward("outputxsize", options.outputxsize);
 	p.forward("outputysize", options.outputysize);
+	p.plot();
 	p(n, a);
 	return 0; 
 }
