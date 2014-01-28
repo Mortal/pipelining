@@ -35,13 +35,8 @@ public:
 	}
 
 	void end() override {
-		dest.push(row);
-		std::fill(row.begin(), row.end(), nodata);
-		++y;
-		while (y < ysize) {
-			dest.push(row);
-			++y;
-		}
+		// Ensure we have pushed all rows before `ysize`
+		push(value_point{point2{0,ysize},nodata});
 		row.resize(0);
 	}
 
