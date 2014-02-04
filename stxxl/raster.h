@@ -6,6 +6,7 @@
 
 #include <gdal.h>
 #include <gdal_priv.h>
+#include "progress.h"
 
 class RasterReader {
 public:
@@ -21,10 +22,10 @@ public:
 	bool empty() const { return y >= ysize; }
 
 	RasterReader & operator++() {
-		if (y == 0) std::cout << "RasterReader: Read first row" << std::endl;
 		++y;
+		set_progress("Read raster", y, ysize);
 		if (!empty()) peek();
-		else std::cout << "RasterReader: Finish reading" << std::endl;
+		else end_progress();
 		return *this;
 	}
 
@@ -49,9 +50,9 @@ private:
 };
 
 template <typename InputStream>
-void write_raster(InputStream & inputStream, GDALRasterBand * band, int xsize) {
-	std::cout << "write_raster: Begin output" << std::endl;
+void write_raster(InputStream & inputStream, GDALRasterBand * band, int xsize, int ysize) {
 	for (int y = 0; !inputStream.empty(); ++y, ++inputStream) {
+		set_progress("Write raster", y+1, ysize);
 		band->RasterIO(GF_Write,
 					   0, y, //offset
 					   xsize, 1, //size
@@ -60,6 +61,7 @@ void write_raster(InputStream & inputStream, GDALRasterBand * band, int xsize) {
 					   GDT_Float32, //Type
 					   0, 0); //byte offset
 	}
+	end_progress();
 }
 
 #endif // RASTER_H

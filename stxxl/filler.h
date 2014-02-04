@@ -22,7 +22,6 @@ public:
 	}
 
 	Filler & operator++() {
-		if (empty()) {std::cout << "filler: now done (1)" << std::endl; }
 		if (empty()) return *this;
 		map_point p;
 		size_t skipped = 0;
@@ -36,7 +35,6 @@ public:
 				++src;
 			}
 		} while ((*src)[p.from.x] == nodata);
-		if (empty()) {std::cout << "filler: now done (2)" << std::endl; }
 		return *this;
 	}
 

@@ -3,6 +3,8 @@
 #ifndef POINTGENERATOR_H
 #define POINTGENERATOR_H
 
+#include "progress.h"
+
 class point_generator {
 public:
 	typedef point2 value_type;
@@ -19,9 +21,11 @@ public:
 		if (m_x == m_xsize - 1) {
 			m_x = 0;
 			++m_y;
+			set_progress("Generate points", m_y, m_ysize);
 		} else {
 			++m_x;
 		}
+		if (empty()) end_progress();
 		return *this;
 	}
 

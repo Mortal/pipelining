@@ -74,7 +74,6 @@ int main(int argc, char ** argv) {
 
 	typedef sxs::runs_merger<rc_type::sorted_runs_type, map_point_value_less> rm_type;
 	rm_type rm(rc.result(), map_point_value_less(), phase2_sort_memory);
-	std::cout << "Initialized runs merger 1" << std::endl;
 
 	typedef RasterReader raster_reader_type;
 	raster_reader_type raster_reader(in_band, xsize, ysize);
@@ -87,13 +86,10 @@ int main(int argc, char ** argv) {
 
 	typedef sxs::runs_merger<rc_filler_type::sorted_runs_type, value_point_less> rm_filler_type;
 	rm_filler_type rm_filler(rc_filler.result(), value_point_less(), phase3_sort_memory);
-	std::cout << "Initialized runs merger 2" << std::endl;
 
 	typedef PointToRaster<rm_filler_type> point_to_raster_type;
 	point_to_raster_type point_to_raster(rm_filler, options.outputxsize, options.outputysize, nodata);
-	std::cout << "Initialized point_to_raster" << std::endl;
 
-	write_raster(point_to_raster, out_band, options.outputxsize);
-	std::cout << "I am now done" << std::endl;
+	write_raster(point_to_raster, out_band, options.outputxsize, options.outputysize);
 	return 0;
 }
