@@ -52,13 +52,14 @@ int main(int argc, char ** argv) {
 
 	tp::passive_sorter<map_point, map_point::from_yorder> ps;
 
-	tp::pipeline p_ = pointGenerator() 
+	tp::pipeline p_
+		= pointGenerator()
 		| pointMap(options.transform)
 		| ps.input();
-	
-	tp::pipeline p=
-		rasterReader(in_band)
-		| filler(ps.output() | tp::pull_peek()) 
+
+	tp::pipeline p
+		= rasterReader(in_band)
+		| filler(ps.output() | tp::pull_peek())
 		| tp::sort(value_point::yorder())
 		| pointToRaster()
 		| rasterWriter(out_band);
