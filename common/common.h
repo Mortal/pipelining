@@ -28,19 +28,8 @@ struct matrix_transform {
 		std::copy(l.begin(), l.end(), coordinates);
 	}
 
-	// Multiply by l from the left (not the right as you might expect)
-	void multiply(std::vector<double> l) {
-		std::vector<double> a(coordinates, coordinates+DIM*DIM);
-		for (size_t i = 0; i < DIM; ++i) {
-			for (size_t j = 0; j < DIM; ++j) {
-				double r = 0.0;
-				for (size_t k = 0; k < DIM; ++k) {
-					r += a[k*DIM + j] * l[i*DIM + k];
-				}
-				coordinates[i*DIM + j] = r;
-			}
-		}
-	}
+	// Multiply by l from the right
+	void right_multiply(std::vector<double> l);
 };
 
 struct program_options {
@@ -61,6 +50,15 @@ struct program_options {
 	}
 
 	bool parse_args(int argc, char ** argv) {
+		// If the user specifies transforms A, B, C
+		// to be applied in that order to the input,
+		// this is equivalent to applying the matrix product CBA to the input.
+		// In terms of the output, we must apply
+		// (CBA)^-1 = A^-1 B^-1 C^-1  to each output point
+		// to get the corresponding input point.
+		// Therefore, process the arguments from left to right,
+		// for each transformation multiplying the inverse transformation
+		// on the right.
 		transform.set({
 			1, 0, 0,
 			0, 1, 0,
@@ -79,7 +77,7 @@ struct program_options {
 			} else if (arg == "--translate") {
 				double dx, dy;
 				std::stringstream(argv[++i]) >> dx >> dy;
-				transform.multiply({
+				transform.right_multiply({
 					1, 0, -dx,
 					0, 1, -dy,
 					0, 0, 1
@@ -87,15 +85,15 @@ struct program_options {
 			} else if (arg == "--rotate") {
 				double theta;
 				std::stringstream(argv[++i]) >> theta;
-				transform.multiply({
-					cos(-theta), -sin(-theta), 0,
-					sin(-theta), cos(-theta), 0,
+				transform.right_multiply({
+					cos(-theta), sin(-theta), 0,
+					-sin(-theta), cos(-theta), 0,
 					0, 0, 1
 				});
 			} else if (arg == "--scale") {
 				double factor;
 				std::stringstream(argv[++i]) >> factor;
-				transform.multiply({
+				transform.right_multiply({
 					1.0/factor, 0, 0,
 					0, 1.0/factor, 0,
 					0, 0, 1

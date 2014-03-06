@@ -12,3 +12,16 @@ point2 matrix_transform::operator()(const point2 & pt) {
 		+ coordinates[5];
 	return res;
 }
+
+void matrix_transform::right_multiply(std::vector<double> l) {
+	std::vector<double> a(coordinates, coordinates+DIM*DIM);
+	for (size_t i = 0; i < DIM; ++i) {
+		for (size_t j = 0; j < DIM; ++j) {
+			double r = 0.0;
+			for (size_t k = 0; k < DIM; ++k) {
+				r += a[k*DIM + j] * l[i*DIM + k];
+			}
+			coordinates[i*DIM + j] = r;
+		}
+	}
+}
