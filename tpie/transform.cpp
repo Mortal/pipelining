@@ -3,7 +3,6 @@
 
 #include "../common/common.h"
 #include <tpie/pipelining.h>
-#include "factory_helpers.h"
 #include "map.h"
 #include "pointgenerator.h"
 #include "raster.h"
