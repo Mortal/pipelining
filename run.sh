@@ -45,32 +45,34 @@ function run() {
 		--translate "-$((width/2)) -$((height/2))"
 }
 
+collectl_base=./collectl
+mkdir -p "$collectl_base"
 if [ "x$kind" = "ximperative" -o "x$kind" = "x" ]; then
 	echo "Running TPIE imperative"
-	rm -rf collectl/tpie-imperative/
+	rm -rf "$collectl_base/tpie-imperative/"
 	rm -f $output
 
-	collectl -sdCM -P -f collectl/tpie-imperative/ & collect=$!
+	collectl -sdCM -P -f "$collectl_base/tpie-imperative/" & collect=$!
 	run build/tpie_imperative/tpie-imperative-transform
 	kill $collect
 fi
 
 if [ "x$kind" = "xtpie" -o "x$kind" = "x" ]; then
 	echo "Running TPIE pipelining"
-	rm -rf collectl/tpie/
+	rm -rf "$collectl_base/tpie/"
 	rm -f $output
 
-	collectl -sdCM -P -f collectl/tpie/ & collect=$!
+	collectl -sdCM -P -f "$collectl_base/tpie/" & collect=$!
 	run build/tpie/tpie-transform
 	kill $collect
 fi
 
 if [ "x$kind" = "xstxxl" -o "x$kind" = "x" ]; then
 	echo "Running STXXL"
-	rm -rf collectl/stxxl/
+	rm -rf "$collectl_base/stxxl/"
 	rm -f $output
 
-	collectl -sdCM -P -f collectl/stxxl/ & collect=$!
+	collectl -sdCM -P -f "$collectl_base/stxxl/" & collect=$!
 	run build/stxxl/stxxl-transform
 	kill $collect
 fi
