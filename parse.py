@@ -59,8 +59,10 @@ def file_handler(trigger):
 @file_handler('.cpu')
 def handle_cpu_data(fp):
     def handle_line(rel_time, data):
-        cpu = sum(int(v) for k, v in data.items() if k.endswith('Totl%')) / 100
-        return TimedData(rel_time, {'cpu': cpu})
+        d = {}
+        for k, header in (('cpu', 'Totl%'), ('soft', 'Soft%'), ('wait', 'Wait%'), ('sys', 'Sys%')):
+            d[k] = sum(int(v) for k, v in data.items() if k.endswith(header)) / 100
+        return TimedData(rel_time, d)
 
     return handle_csv_timestamped(fp, handle_line)
 
