@@ -47,7 +47,7 @@ struct Filler {
 
 template <typename psf_t>
 tp::pipe_middle<tp::tempfactory<Filler<psf_t>, psf_t> > filler(psf_t psf) {
-	return tp::tempfactory<Filler<psf_t>, psf_t>(psf);
+	return {std::move(psf)};
 }
 
 #endif //FILLER_H

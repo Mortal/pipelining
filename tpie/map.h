@@ -37,8 +37,8 @@ public:
 };
 
 template <typename F>
-tp::pipe_middle<tp::tempfactory<PointMap<F>, F> > pointMap(const F & f) {
-	return tp::tempfactory<PointMap<F>, F>(f);
+tp::pipe_middle<tp::tempfactory<PointMap<F>, F> > pointMap(F f) {
+	return {std::move(f)};
 }
 
 #endif // MAP_H
