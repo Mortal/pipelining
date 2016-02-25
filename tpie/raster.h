@@ -8,7 +8,7 @@
 template <typename dest_t>
 class RasterReader : public tp::node {
 public:
-	RasterReader(dest_t && dest, GDALRasterBand * band):
+	RasterReader(dest_t dest, GDALRasterBand * band):
 		dest(std::move(dest)), band(band) {}
 
 	virtual void prepare() override {

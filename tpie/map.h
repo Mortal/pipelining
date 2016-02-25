@@ -14,7 +14,7 @@ public:
 	public:
 		typedef point2 item_type;
 		
-		type(dest_t && dest, F f)
+		type(dest_t dest, F f)
 			: f(std::move(f))
 			, dest(std::move(dest)) {}
 

@@ -11,7 +11,7 @@ namespace tp=tpie::pipelining;
 template <typename dest_t>
 class PointToRaster: public tp::node {
 public:
-	PointToRaster(dest_t && dest): dest(std::move(dest)) {}
+	PointToRaster(dest_t dest): dest(std::move(dest)) {}
 
 	void prepare() override {
 		xsize = fetch<int>("outputxsize");

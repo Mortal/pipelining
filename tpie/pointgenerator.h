@@ -6,7 +6,7 @@
 template <typename dest_t>
 class PointGenerator : public tp::node {
 public:
-	PointGenerator(dest_t && dest)
+	PointGenerator(dest_t dest)
 		: dest(std::move(dest)) {}
 
 	virtual void propagate() override {

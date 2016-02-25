@@ -16,7 +16,7 @@ struct Filler {
 	template <typename dest_t>
 	class type: public tp::node {
 	public:
-		type(dest_t && dest, psf_t point_source_factory)
+		type(dest_t dest, psf_t point_source_factory)
 			: dest(std::move(dest)),
 			  point_source(point_source_factory.construct()) {
 			add_push_destination(dest);
