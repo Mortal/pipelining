@@ -7,7 +7,6 @@
 #include "pointgenerator.h"
 #include "raster.h"
 #include "filler.h"
-#include "point_to_raster.h"
 #include <tpie/progress_indicator_arrow.h>
 
 namespace tp = tpie::pipelining;
@@ -60,8 +59,7 @@ int main(int argc, char ** argv) {
 		= read_raster(in_band)
 		| filler(output_point_sorter.output() | tp::pull_peek())
 		| tp::sort(value_point::yorder())
-		| pointToRaster()
-		| write_raster_rows(out_band);
+		| write_raster(out_band);
 
 	tpie::stream_size_type n=xsize*(tpie::stream_size_type)ysize;
 	tpie::progress_indicator_arrow a("", n);

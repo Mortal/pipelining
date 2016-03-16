@@ -4,6 +4,7 @@
 #define RASTER_H
 #include <gdal.h>
 #include <gdal_priv.h>
+#include "point_to_raster.h"
 
 template <typename dest_t>
 class RasterReader : public tp::node {
@@ -66,5 +67,10 @@ private:
 
 typedef tp::pipe_begin<tp::factory<RasterReader, GDALRasterBand*> > read_raster;
 typedef tp::pipe_end<tp::termfactory<RasterWriter, GDALRasterBand*> > write_raster_rows;
+
+decltype(pointToRaster() | write_raster_rows(nullptr))
+write_raster(GDALRasterBand * band) {
+	return pointToRaster() | write_raster_rows(band);
+}
 
 #endif //RASTER_H
