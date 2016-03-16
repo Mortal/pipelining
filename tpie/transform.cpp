@@ -49,16 +49,16 @@ int main(int argc, char ** argv) {
 	out_band->SetNoDataValue(nodata);
 	/// Done initializing GDAL
 
-	tp::passive_sorter<map_point, map_point::from_yorder> ps;
+	tp::passive_sorter<map_point, map_point::from_yorder> output_point_sorter;
 
 	tp::pipeline p_
 		= generate_output_points()
 		| compute_transformation(options.transform)
-		| ps.input();
+		| output_point_sorter.input();
 
 	tp::pipeline p
 		= rasterReader(in_band)
-		| filler(ps.output() | tp::pull_peek())
+		| filler(output_point_sorter.output() | tp::pull_peek())
 		| tp::sort(value_point::yorder())
 		| pointToRaster()
 		| rasterWriter(out_band);
