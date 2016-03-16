@@ -52,7 +52,7 @@ int main(int argc, char ** argv) {
 	tp::passive_sorter<map_point, map_point::from_yorder> ps;
 
 	tp::pipeline p_
-		= pointGenerator()
+		= generate_output_points()
 		| compute_transformation(options.transform)
 		| ps.input();
 

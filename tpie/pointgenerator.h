@@ -33,6 +33,6 @@ private:
 	dest_t dest;
 };
 
-typedef tp::pipe_begin<tp::factory<PointGenerator> > pointGenerator;
+typedef tp::pipe_begin<tp::factory<PointGenerator> > generate_output_points;
 
 #endif // POINTGENERATOR_H
