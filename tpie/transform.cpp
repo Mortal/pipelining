@@ -61,7 +61,7 @@ int main(int argc, char ** argv) {
 		| filler(output_point_sorter.output() | tp::pull_peek())
 		| tp::sort(value_point::yorder())
 		| pointToRaster()
-		| write_raster(out_band);
+		| write_raster_rows(out_band);
 
 	tpie::stream_size_type n=xsize*(tpie::stream_size_type)ysize;
 	tpie::progress_indicator_arrow a("", n);
