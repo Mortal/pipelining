@@ -64,7 +64,7 @@ private:
 	int y;
 };
 
-typedef tp::pipe_begin<tp::factory<RasterReader, GDALRasterBand*> > rasterReader;
+typedef tp::pipe_begin<tp::factory<RasterReader, GDALRasterBand*> > read_raster;
 typedef tp::pipe_end<tp::termfactory<RasterWriter, GDALRasterBand*> > rasterWriter;
 
 #endif //RASTER_H

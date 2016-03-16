@@ -57,7 +57,7 @@ int main(int argc, char ** argv) {
 		| output_point_sorter.input();
 
 	tp::pipeline p
-		= rasterReader(in_band)
+		= read_raster(in_band)
 		| filler(output_point_sorter.output() | tp::pull_peek())
 		| tp::sort(value_point::yorder())
 		| pointToRaster()
