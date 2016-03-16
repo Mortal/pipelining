@@ -71,6 +71,6 @@ int main(int argc, char ** argv) {
 	p.forward("outputxsize", options.outputxsize);
 	p.forward("outputysize", options.outputysize);
 	p.plot();
-	p(n, a);
+	p(n, a, TPIE_FSI);
 	return 0;
 }
