@@ -37,7 +37,7 @@ public:
 };
 
 template <typename F>
-tp::pipe_middle<tp::tempfactory<PointMap<F>, F> > pointMap(F f) {
+tp::pipe_middle<tp::tempfactory<PointMap<F>, F> > compute_transformation(F f) {
 	return {std::move(f)};
 }
 

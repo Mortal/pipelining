@@ -53,7 +53,7 @@ int main(int argc, char ** argv) {
 
 	tp::pipeline p_
 		= pointGenerator()
-		| pointMap(options.transform)
+		| compute_transformation(options.transform)
 		| ps.input();
 
 	tp::pipeline p
