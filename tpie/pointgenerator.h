@@ -7,7 +7,9 @@ template <typename dest_t>
 class PointGenerator : public tp::node {
 public:
 	PointGenerator(dest_t dest)
-		: dest(std::move(dest)) {}
+		: dest(std::move(dest)) {
+		this->set_name("Generate output points");
+	}
 
 	virtual void propagate() override {
 		int xsize = fetch<int>("outputxsize");
