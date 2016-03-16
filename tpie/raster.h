@@ -65,6 +65,6 @@ private:
 };
 
 typedef tp::pipe_begin<tp::factory<RasterReader, GDALRasterBand*> > read_raster;
-typedef tp::pipe_end<tp::termfactory<RasterWriter, GDALRasterBand*> > rasterWriter;
+typedef tp::pipe_end<tp::termfactory<RasterWriter, GDALRasterBand*> > write_raster;
 
 #endif //RASTER_H
