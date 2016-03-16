@@ -15,19 +15,19 @@ namespace tp = tpie::pipelining;
 int main(int argc, char ** argv) {
 	program_options options;
 	if (!options.parse_args(argc, argv)) return EXIT_FAILURE;
-	
+
 	tpie::tpie_init();
 	tpie::get_memory_manager().set_limit(options.memory*1024*1024);
 	/// Initialize GDAL
 	GDALAllRegister();
-	
+
 	std::unique_ptr<GDALDataset> in((GDALDataset*)GDALOpen(options.input_file.c_str(), GA_ReadOnly));
 	int xsize = in->GetRasterXSize();
 	int ysize = in->GetRasterYSize();
 
 	if (options.outputxsize == -1) options.outputxsize=xsize;
 	if (options.outputysize == -1) options.outputysize=ysize;
-	
+
 	GDALDriver * driver = GetGDALDriverManager()->GetDriverByName("ENVI");
 	std::unique_ptr<GDALDataset> out(driver->Create(options.output_file.c_str(), 
 													options.outputxsize, options.outputysize, 
@@ -35,13 +35,13 @@ int main(int argc, char ** argv) {
 
 	double geoCoords[6];  //Geographic metadata
 	if (in->GetGeoTransform(geoCoords) == CE_None) out->SetGeoTransform(geoCoords);
-	
+
 	const char * sref = in->GetProjectionRef();
 	if (sref != NULL) out->SetProjection(sref);
-	
+
 	GDALRasterBand * in_band = in->GetRasterBand(1);
 	GDALRasterBand * out_band = out->GetRasterBand(1);
-	
+
 	float nodata;
 	int has_nodata = false;
 	nodata = in_band->GetNoDataValue(&has_nodata);
@@ -62,7 +62,7 @@ int main(int argc, char ** argv) {
 		| tp::sort(value_point::yorder())
 		| pointToRaster()
 		| rasterWriter(out_band);
-	
+
 	tpie::stream_size_type n=xsize*(tpie::stream_size_type)ysize;
 	tpie::progress_indicator_arrow a("", n);
 	p.forward("xsize", xsize);
@@ -72,5 +72,5 @@ int main(int argc, char ** argv) {
 	p.forward("outputysize", options.outputysize);
 	p.plot();
 	p(n, a);
-	return 0; 
+	return 0;
 }
