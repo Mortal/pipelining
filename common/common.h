@@ -10,6 +10,9 @@
 #include <sstream>
 #include <vector>
 #include <cmath>
+#include <memory>
+#include <gdal.h>
+#include <gdal_priv.h>
 
 struct point2;
 
@@ -142,6 +145,105 @@ struct map_point {
 			return point2::yorder()(lhs.from, rhs.from);
 		}
 	};
+};
+
+struct raster_input {
+	std::unique_ptr<GDALDataset> input_dataset;
+	GDALRasterBand * input_band;
+
+	static raster_input open(std::string filename) {
+		std::unique_ptr<GDALDataset> input_dataset {(GDALDataset *) GDALOpen(filename.c_str(), GA_ReadOnly)};
+		return {std::move(input_dataset), nullptr};
+	}
+
+	std::pair<int, int> dimensions() {
+		return {input_dataset->GetRasterXSize(),
+				input_dataset->GetRasterYSize()};
+	}
+
+	void init_band() {
+		if (input_band == nullptr)
+			input_band = input_dataset->GetRasterBand(1);
+	}
+
+	GDALRasterBand * get_input_band() {
+		init_band();
+		return input_band;
+	}
+
+	float nodata_value() {
+		float nodata;
+		int has_nodata = false;
+		nodata = get_input_band()->GetNoDataValue(&has_nodata);
+		if (!has_nodata) nodata = -9999;
+		return nodata;
+	}
+
+	uint64_t cell_count() {
+		uint64_t xsize, ysize;
+		std::tie(xsize, ysize) = dimensions();
+		return xsize * ysize;
+	}
+};
+
+struct raster_output {
+	std::unique_ptr<GDALDataset> output_dataset;
+	GDALRasterBand * output_band;
+
+	static raster_output create(std::string filename, raster_input & input,
+								int outputxsize, int outputysize) {
+		GDALDriver * driver = GetGDALDriverManager()->GetDriverByName("ENVI");
+		int xsize, ysize;
+		std::tie(xsize, ysize) = input.dimensions();
+		if (outputxsize != -1) xsize = outputxsize;
+		if (outputysize != -1) ysize = outputysize;
+		std::unique_ptr<GDALDataset> out {
+			driver->Create(filename.c_str(),
+						   xsize, ysize,
+						   1, GDT_Float32, nullptr)};
+
+		double geoCoords[6];  //Geographic metadata
+		if (input.input_dataset->GetGeoTransform(geoCoords) == CE_None)
+			out->SetGeoTransform(geoCoords);
+
+		const char * sref = input.input_dataset->GetProjectionRef();
+		if (sref != NULL) out->SetProjection(sref);
+
+		GDALRasterBand * out_band = out->GetRasterBand(1);
+		out_band->SetNoDataValue(input.nodata_value());
+
+		raster_output r = {std::move(out), out_band};
+		return std::move(r);
+	}
+
+	std::pair<int, int> dimensions() {
+		return {output_dataset->GetRasterXSize(),
+				output_dataset->GetRasterYSize()};
+	}
+
+	void init_band() {
+		if (output_band == nullptr)
+			output_band = output_dataset->GetRasterBand(1);
+	}
+
+	GDALRasterBand * get_output_band() {
+		init_band();
+		return output_band;
+	}
+
+	float nodata_value() {
+		float nodata;
+		int has_nodata = false;
+		nodata = get_output_band()->GetNoDataValue(&has_nodata);
+		if (!has_nodata) nodata = -9999;
+		return nodata;
+	}
+
+	uint64_t cell_count() {
+		uint64_t xsize, ysize;
+		std::tie(xsize, ysize) = dimensions();
+		return xsize * ysize;
+	}
 };
 
 #endif // COMMON_COMMON_H

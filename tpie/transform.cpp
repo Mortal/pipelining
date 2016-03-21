@@ -20,32 +20,9 @@ int main(int argc, char ** argv) {
 	/// Initialize GDAL
 	GDALAllRegister();
 
-	std::unique_ptr<GDALDataset> in((GDALDataset*)GDALOpen(options.input_file.c_str(), GA_ReadOnly));
-	int xsize = in->GetRasterXSize();
-	int ysize = in->GetRasterYSize();
-
-	if (options.outputxsize == -1) options.outputxsize=xsize;
-	if (options.outputysize == -1) options.outputysize=ysize;
-
-	GDALDriver * driver = GetGDALDriverManager()->GetDriverByName("ENVI");
-	std::unique_ptr<GDALDataset> out(driver->Create(options.output_file.c_str(), 
-													options.outputxsize, options.outputysize, 
-													1, GDT_Float32 , nullptr));
-
-	double geoCoords[6];  //Geographic metadata
-	if (in->GetGeoTransform(geoCoords) == CE_None) out->SetGeoTransform(geoCoords);
-
-	const char * sref = in->GetProjectionRef();
-	if (sref != NULL) out->SetProjection(sref);
-
-	GDALRasterBand * in_band = in->GetRasterBand(1);
-	GDALRasterBand * out_band = out->GetRasterBand(1);
-
-	float nodata;
-	int has_nodata = false;
-	nodata = in_band->GetNoDataValue(&has_nodata);
-	if (!has_nodata) nodata=-9999;
-	out_band->SetNoDataValue(nodata);
+	raster_input input = raster_input::open(options.input_file);
+	raster_output output = raster_output::create(
+		options.output_file, input, options.outputxsize, options.outputysize);
 	/// Done initializing GDAL
 
 	tp::passive_sorter<map_point, map_point::from_yorder> output_point_sorter;
@@ -56,10 +33,10 @@ int main(int argc, char ** argv) {
 		| output_point_sorter.input();
 
 	tp::pipeline p
-		= read_raster(in_band)
+		= read_raster(&input)
 		| filler(output_point_sorter.output() | tp::pull_peek())
 		| tp::sort(value_point::yorder())
-		| write_raster(out_band);
+		| write_raster(&output);
 
 	tpie::stream_size_type n=xsize*(tpie::stream_size_type)ysize;
 	tpie::progress_indicator_arrow a("", n);

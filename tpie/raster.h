@@ -2,15 +2,13 @@
 // vi:set ts=4 sts=4 sw=4 noet :
 #ifndef RASTER_H
 #define RASTER_H
-#include <gdal.h>
-#include <gdal_priv.h>
 #include "point_to_raster.h"
 
 template <typename dest_t>
 class RasterReader : public tp::node {
 public:
-	RasterReader(dest_t dest, GDALRasterBand * band):
-		dest(std::move(dest)), band(band) {}
+	RasterReader(dest_t dest, raster_input * input):
+		dest(std::move(dest)), input(input) {}
 
 	virtual void prepare() override {
 		int xsize=fetch<int>("xsize");
@@ -21,6 +19,7 @@ public:
 		int xsize=fetch<int>("xsize");
 		int ysize=fetch<int>("ysize");
 		tpie::array<float> row(xsize);
+		GDALRasterBand * band = input->get_input_band();
 		for (int y=0; y < ysize; ++y) {
 			band->RasterIO(GF_Read,
 						   0, y, // offset
@@ -35,12 +34,12 @@ public:
 	}
 private:
 	dest_t dest;
-	GDALRasterBand * band;
+	raster_input * input;
 };
 
 class RasterWriter : public tp::node {
 public:
-	RasterWriter(GDALRasterBand * band): band(band), y(0) {}
+	RasterWriter(raster_output * output): band(output->get_output_band()), y(0) {}
 
 	void propagate() override {
 		outputxsize = fetch<int>("outputxsize");
@@ -65,12 +64,12 @@ private:
 	int y;
 };
 
-typedef tp::pipe_begin<tp::factory<RasterReader, GDALRasterBand*> > read_raster;
-typedef tp::pipe_end<tp::termfactory<RasterWriter, GDALRasterBand*> > write_raster_rows;
+typedef tp::pipe_begin<tp::factory<RasterReader, raster_input *> > read_raster;
+typedef tp::pipe_end<tp::termfactory<RasterWriter, raster_output *> > write_raster_rows;
 
 decltype(pointToRaster() | write_raster_rows(nullptr))
-write_raster(GDALRasterBand * band) {
-	return pointToRaster() | write_raster_rows(band);
+write_raster(raster_output * output) {
+	return pointToRaster() | write_raster_rows(output);
 }
 
 #endif //RASTER_H
