@@ -34,7 +34,7 @@ int main(int argc, char ** argv) {
 
 	tp::pipeline p
 		= read_raster(&input)
-		| filler(output_point_sorter.output() | tp::pull_peek())
+		| fill_output_points(output_point_sorter.output() | tp::pull_peek())
 		| tp::sort(value_point::yorder())
 		| write_raster(&output);
 
