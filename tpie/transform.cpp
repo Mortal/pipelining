@@ -38,13 +38,15 @@ int main(int argc, char ** argv) {
 		| tp::sort(value_point::yorder())
 		| write_raster(&output);
 
-	tpie::stream_size_type n=xsize*(tpie::stream_size_type)ysize;
+	tpie::stream_size_type n = input.cell_count() + output.cell_count();
 	tpie::progress_indicator_arrow a("", n);
-	p.forward("xsize", xsize);
-	p.forward("ysize", ysize);
-	p.forward("nodata", nodata);
-	p.forward("outputxsize", options.outputxsize);
-	p.forward("outputysize", options.outputysize);
+	int ixsize, iysize; std::tie(ixsize, iysize) = input.dimensions();
+	int oxsize, oysize; std::tie(oxsize, oysize) = output.dimensions();
+	p.forward("xsize", ixsize);
+	p.forward("ysize", iysize);
+	p.forward("nodata", input.nodata_value());
+	p.forward("outputxsize", oxsize);
+	p.forward("outputysize", oysize);
 	p.plot();
 	p(n, a, TPIE_FSI);
 	return 0;
