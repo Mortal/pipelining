@@ -59,7 +59,7 @@ int main(int argc, char ** argv) {
 	tpie::fractional_subindicator p_write(fp, "write", TPIE_FSI, out_n, "Writing points to raster");
 	fp.init();
 
-// Generate points in the output raster
+// Sort the input points into the order in which they appear in the output.
 tpie::file_stream<map_point> stream1; stream1.open();
 for (int y = 0; y < outputysize; ++y)
     for (int x = 0; x < outputxsize; ++x) {
@@ -67,7 +67,9 @@ for (int y = 0; y < outputysize; ++y)
         if (0 <= p.from.x && p.from.x < xsize && 0 <= p.from.y && p.from.y < ysize)
             stream1.write(p);
     }
+// Sort the input points in row-major order, so we can scan them simultaneously with A.
 tpie::sort(stream1);
+// Scan input raster and input point stream, filling the input points with values.
 stream1.seek(0);  // Seek to beginning of stream
 tpie::file_stream<value_point> stream2; stream2.open();
 tpie::array<float> row1(xsize);
@@ -79,14 +81,16 @@ for (int y = 0; y < ysize; ++y) {
     }
 }
 stream1.close();
+// Sort the filled input points into output order.
 tpie::sort(stream2);
+// Write the output points to a raster.
 stream2.seek(0);  // Seek to beginning of stream
-tpie::array<float> row2(outputxsize); 
+tpie::array<float> row2(outputxsize);
 for (int y = 0; y < outputysize; ++y) {
     for (int x = 0; x < outputxsize; ++x) row2[x] = nodata;
     while(stream2.can_read() && stream2.peek().point.y == y) {
         value_point p = stream2.read();
-        row2[p.point.x] = p.value; 
+        row2[p.point.x] = p.value;
     }
     output.write_next_row(&row2);
 }
