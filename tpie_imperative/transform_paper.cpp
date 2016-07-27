@@ -1,63 +1,70 @@
-// -*- mode: c++; tab-width: 4; indent-tabs-mode: t; eval: (progn (c-set-style "stroustrup") (c-set-offset 'innamespace 0)); -*-
-// vi:set ts=4 sts=4 sw=4 et :
+#include <iostream>
+#include <vector>
+#include <algorithm>
 
-#include "../common/common.h"
-#include <gdal.h>
-#include <gdal_priv.h>
-#include <tpie/file_stream.h>
-#include <tpie/progress_indicator_arrow.h>
-#include <tpie/sort.h>
+namespace tpie {
+	template <typename T>
+	class file_stream {
+	public:
+		file_stream() {i = 0;}
+		void write(T x) {
+			if (i == contents.size()) contents.push_back(std::move(x));
+			else contents[i] = std::move(x);
+			++i;
+		}
+		void open() {}
+		void close() {}
+		void seek(size_t p) {i = p;}
+		bool can_read() { return i < contents.size(); }
+		T read() { return contents[i++]; }
+		T peek() { return contents[i]; }
 
-int main(int argc, char ** argv) {
-	program_options options;
-	if (!options.parse_args(argc, argv)) return EXIT_FAILURE;
-	
-	tpie::tpie_init();
-	tpie::get_memory_manager().set_limit(options.memory*1024*1024);
-	/// Initialize GDAL
-	GDALAllRegister();
-	
-	std::unique_ptr<GDALDataset> in((GDALDataset*)GDALOpen(options.input_file.c_str(), GA_ReadOnly));
-	int xsize = in->GetRasterXSize();
-	int ysize = in->GetRasterYSize();
+		std::vector<T> contents;
+		size_t i;
+	};
 
-	if (options.outputxsize == -1) options.outputxsize=xsize;
-	if (options.outputysize == -1) options.outputysize=ysize;
-	
-	GDALDriver * driver = GetGDALDriverManager()->GetDriverByName("ENVI");
-	std::unique_ptr<GDALDataset> out(driver->Create(options.output_file.c_str(), 
-													options.outputxsize, options.outputysize, 
-													1, GDT_Float32 , nullptr));
+	template <typename T>
+	class array {
+	public:
+		array(size_t c) { contents.resize(c); }
+		T & operator[](size_t i) {return contents[i];}
 
-	double geoCoords[6];  //Geographic metadata
-	if (in->GetGeoTransform(geoCoords) == CE_None) out->SetGeoTransform(geoCoords);
-	
-	const char * sref = in->GetProjectionRef();
-	if (sref != NULL) out->SetProjection(sref);
-	
-	GDALRasterBand * in_band = in->GetRasterBand(1);
-	GDALRasterBand * out_band = out->GetRasterBand(1);
-	
-	float nodata;
-	int has_nodata = false;
-	nodata = in_band->GetNoDataValue(&has_nodata);
-	if (!has_nodata) nodata=-9999;
-	out_band->SetNoDataValue(nodata);
-	/// Done initializing GDAL
+		std::vector<T> contents;
+	};
 
-	tpie::stream_size_type in_n = xsize * static_cast<tpie::stream_size_type>(ysize);
-	tpie::stream_size_type out_n = options.outputxsize * static_cast<tpie::stream_size_type>(options.outputysize);
-	tpie::stream_size_type n = in_n + out_n;
-	tpie::progress_indicator_arrow pi("Transform", n);
-	tpie::fractional_progress fp(&pi); 
-	fp.id() << __FILE__ << __FUNCTION__;
+	template <typename T>
+	void sort(file_stream<T> & x) {
+		std::sort(x.contents.begin(), x.contents.end());
+	}
+}
 
-	tpie::fractional_subindicator p_gen(fp, "gen", TPIE_FSI, out_n, "Generating points");
-	tpie::fractional_subindicator p_sort1(fp, "sort1", TPIE_FSI, out_n, "Sorting points");
-	tpie::fractional_subindicator p_fill(fp, "fill", TPIE_FSI, n, "Filling points from raster");
-	tpie::fractional_subindicator p_sort2(fp, "sort2", TPIE_FSI, out_n, "Sorting points");
-	tpie::fractional_subindicator p_write(fp, "write", TPIE_FSI, out_n, "Writing points to raster");
-	fp.init();
+struct raster_input {
+	raster_input() { i = 0; }
+	void read_next_row(tpie::array<float> * row) {
+		for (float & x : row->contents) {
+			x = 0.01 + i++ / 50.0;
+		}
+	}
+	size_t i;
+};
+
+struct raster_output {
+	void write_next_row(tpie::array<float> * row) {
+		for (float x : row->contents) {
+			std::cout << x << ' ';
+		}
+		std::cout << '\n';
+	}
+};
+
+struct vec2 { int x, y; };
+vec2 f(vec2 a) { return {a.y, a.x}; }  // Here, f is matrix transposition
+bool operator<(vec2 a, vec2 b) { return (a.y != b.y) ? (a.y < b.y) : (a.x < b.x); }
+struct map_point { vec2 from, to; };
+bool operator<(map_point a, map_point b) { return a.from < b.from; }
+struct value_point { vec2 point; float value; };
+bool operator<(value_point a, value_point b) { return a.point < b.point; }
+int main() {raster_input input; raster_output output; int outputxsize=10, outputysize=10, xsize=10, ysize=10; float nodata=-1;
 
 // Sort the input points into the order in which they appear in the output.
 tpie::file_stream<map_point> stream1; stream1.open();
@@ -96,5 +103,5 @@ for (int y = 0; y < outputysize; ++y) {
 }
 stream2.close();
 
-	return 0; 
+	return 0;
 }
